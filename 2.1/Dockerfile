@@ -1,15 +1,23 @@
-FROM buildpack-deps:jessie
+FROM tcnksm/centos-buildpack-deps:6
 
-RUN apt-get update && apt-get install -y curl procps && rm -rf /var/lib/apt/lists/*
+RUN yum -y update && yum install -y procps tar && yum clean all
+
+# To Build ruby 2.1, Autoconf version 2.67 or higher is required
+RUN mkdir -p /usr/src/autoconf \
+    && curl -SL "http://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz " \
+    | tar -xzC /usr/src/autoconf \
+    && cd /usr/src/autoconf/autoconf-2.69 \
+    && ./configure \
+    && make \
+    && make install \
+    && rm -r /usr/src/autoconf    
 
 ENV RUBY_MAJOR 2.1
 ENV RUBY_VERSION 2.1.4
 
 # some of ruby's build scripts are written in ruby
 # we purge this later to make sure our final image uses what we just built
-RUN apt-get update \
-	&& apt-get install -y bison ruby \
-	&& rm -rf /var/lib/apt/lists/* \
+RUN yum -y update && yum -y install ruby && yum clean all \
 	&& mkdir -p /usr/src/ruby \
 	&& curl -SL "http://cache.ruby-lang.org/pub/ruby/$RUBY_MAJOR/ruby-$RUBY_VERSION.tar.bz2" \
 		| tar -xjC /usr/src/ruby --strip-components=1 \
@@ -17,7 +25,7 @@ RUN apt-get update \
 	&& autoconf \
 	&& ./configure --disable-install-doc \
 	&& make -j"$(nproc)" \
-	&& apt-get purge -y --auto-remove bison ruby \
+	&& yum remove -y ruby \
 	&& make install \
 	&& rm -r /usr/src/ruby
 
