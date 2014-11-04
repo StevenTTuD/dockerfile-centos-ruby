@@ -1,7 +1,5 @@
 FROM tcnksm/centos-buildpack-deps:6
 
-RUN yum -y update && yum install -y procps tar && yum clean all
-
 # To Build ruby 2.1, Autoconf version 2.67 or higher is required
 RUN mkdir -p /usr/src/autoconf \
     && curl -SL "http://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz " \

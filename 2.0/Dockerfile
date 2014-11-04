@@ -1,7 +1,5 @@
 FROM tcnksm/centos-buildpack-deps:6
 
-RUN yum -y update && yum install -y procps tar && yum clean all
-
 ENV RUBY_MAJOR 2.0
 ENV RUBY_VERSION 2.0.0-p594
 
